@@ -1,0 +1,40 @@
+{
+  "name": "dbz_orders_cdc",
+  "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+
+  "database.hostname": "pg-primary.internal",
+  "database.port": "5432",
+  "database.dbname": "app",
+  "database.user": "debezium",
+  "database.password": "${PG_DEBEZIUM_PASSWORD}",
+  "database.sslmode": "disable",
+  "database.tcpKeepAlive": "true",
+
+  "plugin.name": "pgoutput",
+  "slot.name": "dbz_orders_slot_pgout",
+  "slot.drop.on.stop": "false",
+  "publication.name": "dbz_orders_publication",
+  "publication.autocreate.mode": "disabled",
+  "snapshot.mode": "no_data",
+
+  "topic.prefix": "dbz_orders",
+  "table.include.list": "app.orders,app.order_items,inventory.debezium_signal_orders",
+
+  "heartbeat.interval.ms": "5000",
+  "heartbeat.action.query": "INSERT INTO inventory.debezium_heartbeat (id, last_heartbeat) VALUES (1, now()) ON CONFLICT (id) DO UPDATE SET last_heartbeat = EXCLUDED.last_heartbeat",
+  "signal.enabled.channels": "source",
+  "signal.data.collection": "inventory.debezium_signal_orders",
+
+  "errors.retry.timeout": "60000",
+  "errors.retry.delay.max.ms": "5000",
+
+  "max.batch.size": "65536",
+  "max.queue.size": "1048576",
+  "max.queue.size.in.bytes": "1073741824",
+  "producer.override.compression.type": "lz4",
+  "producer.override.linger.ms": "20",
+  "producer.override.batch.size": "524288",
+
+  "tombstones.on.delete": "false",
+  "decimal.handling.mode": "string"
+}
